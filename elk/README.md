@@ -24,6 +24,7 @@ On macOS, create and start the Podman VM first:
 
 ```bash
 podman machine init
+podman machine set --memory 4096
 podman machine start
 ```
 
@@ -36,10 +37,10 @@ podman machine ssh "sudo sysctl -w vm.max_map_count=262144"
 Start the stack from the repository root:
 
 ```bash
-podman compose up -d
+podman-compose -f compose.yaml up -d
 ```
 
-If `podman compose` reports that no compose provider is installed, use `podman-compose`:
+If `podman-compose` is missing, install it first:
 
 ```bash
 brew install podman-compose
@@ -95,18 +96,11 @@ That CSV is a bridge format for later ML scoring. It gives the data-science pipe
 ## Stop The Stack
 
 ```bash
-podman compose down
+podman-compose -f compose.yaml down
 ```
 
 To also remove the local Elasticsearch volume:
 
 ```bash
-podman compose down -v
-```
-
-If you started it with `podman-compose`, use:
-
-```bash
-podman-compose -f compose.yaml down
 podman-compose -f compose.yaml down -v
 ```

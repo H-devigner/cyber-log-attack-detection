@@ -96,20 +96,20 @@ On macOS, start a Podman machine first:
 
 ```bash
 podman machine init
+podman machine set --memory 4096
 podman machine start
 ```
 
 Then start the stack from the project root:
 
 ```bash
-podman compose up -d
+podman-compose -f compose.yaml up -d
 ```
 
-If `podman compose` says no compose provider is installed, install one and run:
+If `podman-compose` is missing, install it first:
 
 ```bash
 brew install podman-compose
-podman-compose -f compose.yaml up -d
 ```
 
 Then create a Kibana data view named `cyberlog-events-*` using `@timestamp` as the time field.
