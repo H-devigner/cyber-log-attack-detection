@@ -10,17 +10,40 @@ It is intended for local development and demos. Logstash reads the sample logs i
 
 ## Requirements
 
-- Docker Desktop or Docker Engine with Docker Compose
-- At least 4 GB of memory available to Docker
+- Podman
+- `podman compose` or `podman-compose`
+- At least 4 GB of memory available to the Podman machine
 
-This machine did not have `docker` installed when this branch was created, so the stack files were added but not run locally.
+This project now uses `compose.yaml` as the stack definition. The container images still come from Elastic's `docker.elastic.co` registry; Podman can pull from that registry without Docker Desktop.
+
+When this branch was updated, Podman CLI existed locally but no Podman machine had been initialized yet, so the stack files were updated but not run locally.
 
 ## Start The Stack
 
-From the repository root:
+On macOS, create and start the Podman VM first:
 
 ```bash
-docker compose up -d
+podman machine init
+podman machine start
+```
+
+If Elasticsearch fails with a `vm.max_map_count` message, set it inside the Podman VM:
+
+```bash
+podman machine ssh "sudo sysctl -w vm.max_map_count=262144"
+```
+
+Start the stack from the repository root:
+
+```bash
+podman compose up -d
+```
+
+If `podman compose` reports that no compose provider is installed, use `podman-compose`:
+
+```bash
+brew install podman-compose
+podman-compose -f compose.yaml up -d
 ```
 
 Open:
@@ -72,11 +95,18 @@ That CSV is a bridge format for later ML scoring. It gives the data-science pipe
 ## Stop The Stack
 
 ```bash
-docker compose down
+podman compose down
 ```
 
 To also remove the local Elasticsearch volume:
 
 ```bash
-docker compose down -v
+podman compose down -v
+```
+
+If you started it with `podman-compose`, use:
+
+```bash
+podman-compose -f compose.yaml down
+podman-compose -f compose.yaml down -v
 ```

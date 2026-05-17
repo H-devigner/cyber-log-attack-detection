@@ -39,6 +39,7 @@ It trains two unified models plus specialist models for each log source:
 
 ```text
 cyber-log-attack-detection/
+  compose.yaml                # Podman Compose ELK stack
   data/
     raw/multisource/          # downloaded public SSH/web/firewall datasets
     processed/multisource/    # normalized labeled event table and scoring sample
@@ -83,18 +84,32 @@ Run the small scenario demo batch:
 ./.venv/bin/python scripts/run_scenario_demo.py
 ```
 
-## Optional ELK Stack
+## Optional ELK Stack With Podman
 
-The `feature/elk-log-ingestion` branch adds a Docker Compose setup for:
+The `feature/elk-log-ingestion` branch adds a Podman Compose setup for:
 
 - Elasticsearch on `http://localhost:9200`
 - Kibana on `http://localhost:5601`
 - Logstash with a parser for sample SSH, web, and firewall logs
 
-Start it from the project root:
+On macOS, start a Podman machine first:
 
 ```bash
-docker compose up -d
+podman machine init
+podman machine start
+```
+
+Then start the stack from the project root:
+
+```bash
+podman compose up -d
+```
+
+If `podman compose` says no compose provider is installed, install one and run:
+
+```bash
+brew install podman-compose
+podman-compose -f compose.yaml up -d
 ```
 
 Then create a Kibana data view named `cyberlog-events-*` using `@timestamp` as the time field.
