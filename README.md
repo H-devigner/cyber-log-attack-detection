@@ -46,8 +46,13 @@ cyber-log-attack-detection/
   reports/multisource/
     figures/                  # EDA and confusion matrix plots
     metrics/                  # JSON metrics, classification reports, sample predictions
+  elk/
+    logstash/                 # local parsing pipeline for SSH/web/firewall logs
+    sample-logs/              # small demo logs for Kibana/Logstash
   scripts/
+    export_elk_events.py
     run_multisource_pipeline.py
+    run_scenario_demo.py
   src/cyberlog_ml/
     eda.py
     modeling.py
@@ -77,6 +82,31 @@ Run the small scenario demo batch:
 ```bash
 ./.venv/bin/python scripts/run_scenario_demo.py
 ```
+
+## Optional ELK Stack
+
+The `feature/elk-log-ingestion` branch adds a Docker Compose setup for:
+
+- Elasticsearch on `http://localhost:9200`
+- Kibana on `http://localhost:5601`
+- Logstash with a parser for sample SSH, web, and firewall logs
+
+Start it from the project root:
+
+```bash
+docker compose up -d
+```
+
+Then create a Kibana data view named `cyberlog-events-*` using `@timestamp` as the time field.
+
+After Logstash indexes the sample events, export them into a CSV bridge for ML experiments:
+
+```bash
+./.venv/bin/python scripts/export_elk_events.py \
+  --output data/scenarios/elk_exported_events.csv
+```
+
+See `elk/README.md` for the full ELK workflow.
 
 ## Latest Local Run
 

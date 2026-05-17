@@ -1,0 +1,5 @@
+2026-05-17T09:07:10Z edge-fw action=DENY src=203.0.113.44 dst=10.0.1.10 proto=TCP dpt=22 spt=50122 rule=wan-in
+2026-05-17T09:07:11Z edge-fw action=DENY src=203.0.113.44 dst=10.0.1.11 proto=TCP dpt=22 spt=50123 rule=wan-in
+2026-05-17T09:07:21Z edge-fw action=ALLOW src=10.0.1.15 dst=198.51.100.9 proto=TCP dpt=443 spt=49302 rule=egress-web
+2026-05-17T09:07:44Z edge-fw action=DROP src=203.0.113.77 dst=10.0.1.20 proto=TCP dpt=3389 spt=54001 rule=wan-in
+2026-05-17T09:08:02Z edge-fw action=ALLOW src=10.0.1.31 dst=198.51.100.31 proto=UDP dpt=53 spt=51611 rule=dns-egress
