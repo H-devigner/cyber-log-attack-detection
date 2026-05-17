@@ -1,0 +1,16 @@
+.venv/
+.cache/
+__pycache__/
+*.py[cod]
+.DS_Store
+
+# Generated pipeline artifacts
+data/raw/**
+data/processed/**
+models/**
+reports/multisource/figures/**
+reports/multisource/metrics/**
+reports/multisource/*.csv
+
+# Keep directory placeholders if you add them later
+!.gitkeep
