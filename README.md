@@ -129,12 +129,65 @@ brew install podman-compose
 
 Then create a Kibana data view named `cyberlog-events-*` using `@timestamp` as the time field.
 
-After Logstash indexes the sample events, export them into a CSV bridge for ML experiments:
+### What To Expect From ELK
+
+ELK is the log ingestion and investigation layer. It does not train the model by itself.
+
+```text
+elk/sample-logs/*.log
+  -> Logstash parses raw SSH/web/firewall lines
+  -> Elasticsearch stores searchable events in cyberlog-events-*
+  -> Kibana lets you filter, search, and dashboard those events
+  -> scripts/score_elk_events.py converts those events into ML features and writes predictions back
+```
+
+The files Logstash reads are sample raw logs for the same log families the model is designed for: SSH auth logs, web-server access logs, and firewall logs. They are not the original training datasets. The model trains on normalized tabular features built from public and synthetic datasets; the ELK scoring bridge converts live/indexed ELK events into that same normalized feature schema before scoring.
+
+### Use ELK Without ML Scoring
+
+After Logstash indexes the sample events, export them into a CSV bridge for inspection:
 
 ```bash
 ./.venv/bin/python scripts/export_elk_events.py \
   --output data/scenarios/elk_exported_events.csv
 ```
+
+### Score ELK Events With The ML Model
+
+If trained model artifacts already exist in `models/`, run:
+
+```bash
+./.venv/bin/python scripts/score_elk_events.py \
+  --write-back \
+  --create-kibana-data-view
+```
+
+If `models/` is missing, create local synthetic demo models first and then score:
+
+```bash
+./.venv/bin/python scripts/score_elk_events.py \
+  --train-demo-models-if-missing \
+  --write-back \
+  --create-kibana-data-view
+```
+
+That writes:
+
+- local CSV: `data/scenarios/elk_ml_scored_events.csv`
+- Elasticsearch predictions index: `cyberlog-ml-predictions-YYYY.MM.dd`
+- Kibana data view: `cyberlog-ml-predictions-*`
+
+For near-real-time demo scoring, run the scorer as a polling loop:
+
+```bash
+./.venv/bin/python scripts/score_elk_events.py \
+  --write-back \
+  --create-kibana-data-view \
+  --watch \
+  --interval-seconds 30
+```
+
+This is near-real-time polling, not a production streaming service. The production version would run the same conversion/scoring logic as a service or queue consumer and write predictions back to Elasticsearch continuously.
 
 See `elk/README.md` for the full ELK workflow.
 

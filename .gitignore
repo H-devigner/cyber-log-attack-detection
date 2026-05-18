@@ -13,6 +13,7 @@ reports/multisource/figures/**
 reports/multisource/metrics/**
 reports/multisource/*.csv
 data/scenarios/elk_exported_events.csv
+data/scenarios/elk_ml_scored_events.csv
 
 # Keep directory placeholders if you add them later
 !.gitkeep
