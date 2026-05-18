@@ -174,30 +174,65 @@ def build_deck() -> None:
     prs.slide_width = Inches(13.333)
     prs.slide_height = Inches(7.5)
 
-    slide = blank_slide(prs, "Cyber Log Attack Detection", "SSH, web-server, and firewall attack detection with machine learning")
+    slide = blank_slide(prs, "Cyber Log Attack Detection", "From infrastructure logs to ML-assisted security triage")
     hero = slide.shapes.add_textbox(Inches(0.85), Inches(2.0), Inches(11.8), Inches(1.1))
     p = hero.text_frame.paragraphs[0]
-    p.text = "A two-pass ML pipeline: first detect attack vs normal, then classify attack type with source-specific specialists."
+    p.text = "A practical pipeline that collects SSH, web, and firewall logs, turns them into searchable events, and scores them with machine learning."
     p.font.size = Pt(26)
     p.font.bold = True
     p.font.color.rgb = COLORS["ink"]
-    add_card(slide, "Data", "Public logs + synthetic coverage for missing labels and scenarios", 0.85, 3.65, 3.7, 1.25, COLORS["blue"])
-    add_card(slide, "Model", "Unified binary detector plus SSH/web/firewall category specialists", 4.85, 3.65, 3.7, 1.25, COLORS["green"])
-    add_card(slide, "Demo", "Scenario batch plus Podman ELK ingestion with Kibana", 8.85, 3.65, 3.7, 1.25, COLORS["amber"])
+    add_card(slide, "Why", "Attack traces are already in logs, but they are noisy and spread across systems.", 0.85, 3.65, 3.7, 1.25, COLORS["red"])
+    add_card(slide, "How", "ELK organizes events; ML prioritizes and categorizes suspicious activity.", 4.85, 3.65, 3.7, 1.25, COLORS["blue"])
+    add_card(slide, "Outcome", "Analysts get searchable evidence plus model predictions in Kibana.", 8.85, 3.65, 3.7, 1.25, COLORS["green"])
 
-    slide = blank_slide(prs, "Problem And Goal")
+    slide = blank_slide(prs, "Why This Matters")
     add_bullets(
         slide,
         [
-            "Security teams receive noisy SSH, web, and firewall logs.",
-            "A single log line is not always enough; context and source type matter.",
-            "Goal: build a repeatable data-science pipeline from logs to EDA, modeling, evaluation, and demo scoring.",
-            "Output: normal vs attack first, attack category second.",
+            "Most attacks leave traces before they become obvious incidents: failed logins, scanner paths, denied ports, unusual outbound traffic.",
+            "The challenge is not lack of logs. The challenge is turning thousands of raw lines into useful security decisions.",
+            "A good detection system reduces alert fatigue by separating normal noise from events worth investigating.",
+            "It also gives analysts context: what happened, where it happened, and which attack family it resembles.",
+        ],
+        0.9,
+        1.35,
+        11.8,
+        4.8,
+        size=18,
+    )
+
+    slide = blank_slide(prs, "Operational Problem")
+    add_bullets(
+        slide,
+        [
+            "SSH logs show authentication attempts, but one failed password can be normal.",
+            "Web logs show every request, but only a few paths may contain SQLi, XSS, traversal, or scanner behavior.",
+            "Firewall logs show traffic decisions, but one deny is often background noise while repeated denies can indicate scanning.",
+            "The project goal is to convert these raw signals into a repeatable detection and investigation workflow.",
         ],
         0.9,
         1.45,
         11.7,
         4.7,
+    )
+
+    slide = blank_slide(prs, "Storyline")
+    add_card(slide, "1. Collect", "Start with SSH, web, and firewall logs from public, synthetic, and sample ELK sources.", 0.7, 1.35, 2.35, 1.25, COLORS["blue"])
+    add_card(slide, "2. Understand", "Run EDA to inspect labels, class balance, sources, and feature behavior.", 3.25, 1.35, 2.35, 1.25, COLORS["amber"])
+    add_card(slide, "3. Learn", "Train unified and specialist models, then compare which design works better.", 5.8, 1.35, 2.35, 1.25, COLORS["green"])
+    add_card(slide, "4. Integrate", "Use ELK for ingestion/search and write ML predictions back to Elasticsearch.", 8.35, 1.35, 2.35, 1.25, COLORS["red"])
+    add_card(slide, "5. Present", "Show the pipeline, scenario results, limitations, and production next steps.", 10.9, 1.35, 2.0, 1.25, COLORS["muted"])
+    add_bullets(
+        slide,
+        [
+            "The presentation follows the same path as the system: logs -> features -> models -> predictions -> analyst view.",
+            "That makes the demo explainable instead of looking like a black box.",
+        ],
+        1.0,
+        3.55,
+        11.1,
+        1.5,
+        size=20,
     )
 
     slide = blank_slide(prs, "Data Sources")
@@ -347,17 +382,67 @@ def build_deck() -> None:
     add_bullets(
         slide,
         [
-            "Logstash parses sample SSH, web, and firewall logs.",
-            "Elasticsearch stores normalized events.",
-            "Kibana supports analyst inspection and dashboards.",
+            "Logstash parses sample SSH, web, and firewall logs into structured fields.",
+            "Elasticsearch stores those events in cyberlog-events-* indexes.",
+            "Kibana gives the analyst a searchable view of raw and parsed evidence.",
             "Podman starts the local stack with: podman-compose -f compose.yaml up -d",
-            "ELK is ingestion/exploration; ML scoring is a separate pipeline.",
+            "The ML bridge then reads those events, scores them, and writes predictions back.",
         ],
         0.9,
         1.35,
         11.8,
         4.4,
         size=18,
+    )
+
+    slide = blank_slide(prs, "ELK To ML Scoring Loop")
+    add_card(slide, "1. Events", "Logstash writes parsed logs to cyberlog-events-*.", 0.65, 1.3, 2.25, 1.25, COLORS["blue"])
+    add_card(slide, "2. Features", "The bridge converts ELK docs into model feature rows.", 3.05, 1.3, 2.25, 1.25, COLORS["amber"])
+    add_card(slide, "3. Scoring", "Binary model first; attack rows go to specialists.", 5.45, 1.3, 2.25, 1.25, COLORS["green"])
+    add_card(slide, "4. Write Back", "Predictions go to cyberlog-ml-predictions-*.", 7.85, 1.3, 2.25, 1.25, COLORS["red"])
+    add_card(slide, "5. Kibana", "Analysts filter the decision layer in Discover.", 10.25, 1.3, 2.25, 1.25, COLORS["muted"])
+    add_table(
+        slide,
+        ["Demo output", "Result"],
+        [
+            ["Input ELK events", "15"],
+            ["Prediction documents", "15"],
+            ["Predicted attacks", "8"],
+            ["Predicted normal", "7"],
+            ["Prediction data view", "cyberlog-ml-predictions-*"],
+        ],
+        1.0,
+        3.35,
+        11.3,
+        2.15,
+    )
+
+    slide = blank_slide(prs, "How To Demo In Kibana")
+    add_table(
+        slide,
+        ["Kibana data view", "What it shows", "Useful filters"],
+        [
+            ["Cyber Log Events", "Raw parsed SSH/web/firewall events", "log_source: ssh"],
+            ["Cyber Log ML Predictions", "Model predictions written back to Elasticsearch", "ml.predicted_binary_label: attack"],
+            ["Cyber Log ML Predictions", "Attack category diagnosis", "ml.predicted_attack_category: firewall_block"],
+        ],
+        0.75,
+        1.35,
+        11.9,
+        2.25,
+    )
+    add_bullets(
+        slide,
+        [
+            "This makes the demo feel operational: first inspect the original logs, then inspect the model's decision layer.",
+            "Near-real-time demo mode is polling: score_elk_events.py --watch --interval-seconds 30.",
+            "Production would turn the polling bridge into a service, queue consumer, or streaming scorer.",
+        ],
+        1.0,
+        4.25,
+        11.2,
+        1.7,
+        size=17,
     )
 
     slide = blank_slide(prs, "Limitations")
@@ -384,7 +469,7 @@ def build_deck() -> None:
             "Create analyst-reviewed labels and track false positives.",
             "Implement rolling-window features for SSH brute force, web scanners, firewall scans, and outbound traffic.",
             "Use chronological train/validation/test splits.",
-            "Connect ELK export or an API to the hybrid ML scorer.",
+            "Harden the ELK-to-ML bridge into a production scoring service.",
         ],
         0.9,
         1.35,
@@ -397,9 +482,9 @@ def build_deck() -> None:
     box = slide.shapes.add_textbox(Inches(1.05), Inches(2.0), Inches(11.25), Inches(2.3))
     p = box.text_frame.paragraphs[0]
     p.text = (
-        "This project demonstrates a complete cybersecurity log ML pipeline: public and synthetic data, "
-        "normalization, EDA, supervised modeling, unified vs specialist comparison, scenario testing, "
-        "and ELK ingestion. The next step is validation on real analyst-labeled operational logs."
+        "This project tells a complete security analytics story: collect logs, understand the data, train models, "
+        "compare architectures, score live ELK events, and bring predictions back to Kibana. The next step is "
+        "validating the same workflow on real analyst-labeled operational logs."
     )
     p.font.size = Pt(24)
     p.font.bold = True
