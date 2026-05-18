@@ -84,6 +84,21 @@ Run the small scenario demo batch:
 ./.venv/bin/python scripts/run_scenario_demo.py
 ```
 
+## Presentation Materials
+
+For a presentation or project defense, use:
+
+- Detailed methodology README: `docs/PROJECT_METHODOLOGY_README.md`
+- Expected audience questions and answers: `docs/PRESENTATION_QA_README.md`
+- PowerPoint deck: `presentation/cyber_log_attack_detection_overview.pptx`
+
+To rebuild the PowerPoint:
+
+```bash
+./.venv/bin/pip install -r requirements-presentation.txt
+./.venv/bin/python scripts/build_presentation.py
+```
+
 ## Optional ELK Stack With Podman
 
 The `feature/elk-log-ingestion` branch adds a Podman Compose setup for:
